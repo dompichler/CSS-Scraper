@@ -1,0 +1,23 @@
+Test: https://www.snk.de/
+	Problem:
+	Erste Sitemap wird nicht richtige umgewandelt, bzw. kann nicht ausgelesen werden!
+
+
+Test: vlyby.com
+	Es existiert keine XML Datei bzw. Sitemap, aber das Programm erkennt das nicht.
+
+
+Test: schoolandoffice.at
+	Seite lädt zu lange und stürzt wohl schlussendlich ab. Warum?
+
+
+Test: trbo.com
+	Funktioniert. Komisch ist aber auch dass hier die Unterseiten der Sitemaps ausgelesen werden können!
+
+
+Test: sixt.de
+	Problem: sitemap.xml verlinkt auf die Startseite. Das sprengt den Rahmen
+
+
+
+
