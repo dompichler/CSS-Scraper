@@ -1,12 +1,3 @@
-# CSS-Scraper
-# CSS-Scraper
-# CSS-Scraper
-# CSS-Scraper
-# CSS-Scraper
-# CSS-Scraper
-# CI-Scraper
-# CI-Scraper
-# CI-Scraper
-# CI-Scraper
-# CSS-Scraper
-# CSS-Scraper
+# CSS-Scraper 
+
+Small tool to check your CSS/CI Settings
