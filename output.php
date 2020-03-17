@@ -21,6 +21,9 @@ $driver = retry(5, function () use($capabilities) {
 
 
 $browser = new Browser($driver);
+
+/* =============== GENERAL SETTINGS & CONFIGURATIONS=============== */
+
 	
 	$userName = $_POST['userUrl'];
 	if(strval($userName) == ""){ $userName ="Webnique";}
@@ -32,31 +35,57 @@ $browser = new Browser($driver);
 	$cssProperty = ['fontFamily','color','font-weight'];
 
 
-
-
-
-
-
 /* =============== Process User-Input  =============== */
-	$userURLToCheck = $_POST['userUrl'];
+//TODO: Testing HostCode Extraction
+$userURLToCheck = $_POST['userUrl'];
 
-
-
-//TODO: Besseres Errorhandling
-
-
-	// ------ URL-Type: www.* ------ (Needs to be casted to the Typ below, to avoid an error)
+// ------ URL-Type: www.* ------ (Needs to be casted to the Typ below, to avoid an error)
 	if(substr( $userURLToCheck, 0, 4 ) === "www.") {
-	//$userURL = 'https://' . $userURL;
 	
-	// ------ Everything else: not valid
-	} else if ((substr( $userURLToCheck, 0, 5 ) !== "https")){
-		//echo "<script> location.href='404.html'; </script>";
-		//exit;
+	//Generating Hostcode (needed to crawl all subpages)
+		$search = 'www' ;
+		$trimmed = str_replace($search, '', $userURLToCheck) ;
+		$hostCode = substr($trimmed, 0, strpos($trimmed, "."));
+	
+	//Casting URL
+		$userURLToCheck = 'https://' . $userURLToCheck;
+		
+
+
+// ------ URL-Type: https.* ------ (No cast needed)
+	} else if ((substr( $userURLToCheck, 0, 5 ) == "https")){
+		
+		
+		//Generating Hostcode (needed to crawl all subpages)
+		
+		$search = 'https://' ;
+		$trimmed = str_replace($search, '', $userURLToCheck) ;
+		$hostCode = substr($trimmed, 0, strpos($trimmed, "."));
+		
+		
+		
+// ------ URL-Type: http.* ------ (No cast needed)
+	} else if ((substr( $userURLToCheck, 0, 4 ) == "http")){
+		
+		//Generating Hostcode (needed to crawl all subpages)
+		$search = 'http://' ;
+		$trimmed = str_replace($search, '', $userURLToCheck) ;
+		$hostCode = substr($trimmed, 0, strpos($trimmed, "."));
+		
 	}
+	
+// ------ No valid URL-Type  - User will be sent to Error page ----
+//TODO: Frühzeitige (ON-PAGE)- Erkennung einbauen um erneute Eingabe zu erlauben
+	else {
+		echo "<script> location.href='404.html'; </script>";
+		exit;
+		}
+	
+	
+	$host = $userURLToCheck;
 
-//TODO: HostCode Extraction muss noch angepasst werden!
 
+	
 /*
 //Extracting a hostcode out of the UserURL to identify all subpages that belong to the userURL
 	$subject = strval($userURL);
@@ -76,17 +105,19 @@ $browser = new Browser($driver);
 
 */
 
+
+/* =============== DEBUG-SETTINGS ==================
+
 $hostCode='webnique';
-	
 $host = $userURL;
 
+*/
 
 
-
-/* =============== Crawling all Subpages ================== */
-/*
-1) Checking if selected URL has a sitemap.
-2) If that's not the case, we'll crawl all subpages ourself.
+/* =============== Crawling all Subpages ==================
+//TODO: Crawling Testen und optimieren
+1) Check if selected URL has a sitemap.
+2) If that's not the case, Subpages will be crawled.
 */
 
 
@@ -122,9 +153,6 @@ $host = $userURL;
 			$dom = new DOMDocument;
 			$dom->loadHTML($sitemapHTML);
 			
-			
-			
-	
 			foreach ($dom->getElementsByTagName('a') as $node)
 			{
 				if(strpos($node->getAttribute("href"), $hostCode)){
@@ -168,8 +196,6 @@ $host = $userURL;
 	// ------- Site does not provide a sitemap. All Subpages have to be crawled manually -------
 			
 			//TODO: Rekursive Unterseiten durchsuchen
-			
-			
 			$urlsCrawled  = $browser->visit($host);
 			$hostSubpages = $browser->script( file_get_contents( 'getSubpages.js' )) [0];
 			//print_r($hostSubpages);
@@ -182,21 +208,39 @@ $host = $userURL;
 
 /* =============== GET UNIQUE CSS-ELEMENTS =============== */
 
-	//Debug-Thing: Setting $userCheckBox to "off" excludes all subpages from the process!
+	//Debug-Thing: Setting $userCheckBox to "off" excludes the styles of all subpages.
 		if($userCheckBox == "on"){
 			$urls = $subpages;
 			$userUrls = [$userURL,];
 		} else {
 			$urls = array ();
-			array_push($urls,$userURL);
+			array_push($urls,$host);
 		};
 
-	$urlCollection = array ();
+
+
+/* ===============  Output Variables  ===============
+
+- All Information, seperately accessable for each URL can found in: data =  $urlCollection[URL][HTML-TAG][CSS-Property]
+- All Information, regardless of the subpages URL's can be found in $elementCollectionEP[HTML-TAG][CSS-Property]
+
+--------- Example: ---------
+
+$elementCollectionEP['h2']['fontFamily'] = array_unique($elementCollectionEP['h2']['fontFamily']);
+	for($i = 0;  $i < sizeof($elementCollectionEP['h2']['fontFamily']); $i++){
+		if(strval($elementCollectionEP['h2']['fontFamily'][$i]) != "" ){
+			print_r("Schriftart_0[".$i."] ".$elementCollectionEP['h2']['fontFamily'][$i]."\n");
+		}
+}
+
+*/
+
+	$urlCollection = array (); //
 	$elementCollection = array();
 	
 	
 //Variable Template
-	$elementCollectionEP = $elementtype; //Element Collection for the entire Page.
+	$elementCollectionEP = $elementtype; //Element Collection for the entire page,.
 
 
 	foreach ($elementtype as  $element){
@@ -214,7 +258,7 @@ foreach ($urls as $url) {
 		$cssProperties = [];
 		foreach ($cssProperty as $prop){
 			
-			//TODO: CSS Properties mit file_get_contents richtig encodieren!
+			//TODO: Font-Families mit file_get_contents richtig encodieren!
 			$cssProperties[$prop] = $browser->script(file_get_contents('styleInFile.js' )."return styleInPage('$prop','$element');") [0];
 			//print_r("CSS: ".$cssProperties[$prop][0]."\n");
 		
@@ -235,87 +279,12 @@ foreach ($urls as $url) {
 }
 	$browser->quit();
 	$process->stop();
-
-	
-	
-/* ===============  Output Variables  ===============
-//Variable to store all unique properties of all pages!
-
-- All Information, seperately accessable for each URL can found in: data =  $urlCollection[URL][HTML-TAG][CSS-Property]
-- All Information, regardless of the URL's can be found in $elementCollectionEP[HTML-TAG][CSS-Property]
-
---------- Example: ---------
-
-
-$elementCollectionEP['h2']['fontFamily'] = array_unique($elementCollectionEP['h2']['fontFamily']);
-	for($i = 0;  $i < sizeof($elementCollectionEP['h2']['fontFamily']); $i++){
-		if(strval($elementCollectionEP['h2']['fontFamily'][$i]) != "" ){
-			print_r("Schriftart_0[".$i."] ".$elementCollectionEP['h2']['fontFamily'][$i]."\n");
-		}
-}
-
-
-		
-====================================================
-
-
-/* ========================= HTML OUTPUT - Test =========================
-
-
-print_r(" ======================= TESTAUSGABE ====================="."/n");
-
-print_r("---------- H1"."\n");
-
-
-for ( $i = 0; $i < sizeof( $elementCollectionEP['h1']['fontFamily'] ); $i ++ ) {
-		print_r($elementCollectionEP['h1']['fontFamily'][$i]."\n");
-}
-
-print_r("---------- H2"."\n");
-$elementCollectionEP['h2']['fontFamily'] = str_replace('\"', '', $elementCollectionEP['h2']['fontFamily']);
-
-
-for ( $i = 0; $i < sizeof( $elementCollectionEP['h2']['fontFamily'] ); $i ++ ) {
-		print_r(strval($elementCollectionEP['h2']['fontFamily'][$i])."\n");
-	
-}
-*/
-
-
-
-//TODO: Font-Family Namen lesbar machen!
-
-	//TODO: Nur für Ausgabe aufbereiten
-        //Zuerst einfach ausgeben lassen!
-
-
-	//TODO: Für Stylesheet-Verwendgung
-
-
-/*
- 
- * Aktuelles Format ?
-
-source_sans_proregular
-entypo-fontello
-source_code_prolight
-source_code_proregular
-source_sans_proitalic
-source_sans_prolight_italic
-
-Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
- *
- *
- * Zulässiges Format?
- * <Body> , Spezifikationen (sans serif, etc ...
- *
- */
-
-/* ======================================================================== */
-
-
-
 ?>
+
+
+
+<!-- ===============  HTML OUTPUT  =============== -->
+
 
 <!doctype html>
 <html lang="en">
@@ -326,32 +295,24 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 	<link rel="stylesheet" href="style.css">
 	
 	
-	<? echo"<title>".$hostCode."- Styleguide</title>"?>
+	<? echo"<title>Styleguide</title>"?>
 </head>
 <body>
-<!-- NEUE VERSION -->
-
-
 <div class = "container">
 	<div class="container_heading">
 		<? echo"<h1>".$userName."- Styleguide</h1>"?>
-		
-		
 	</div>
 	
 	<div class="wrapper">
 		<div class ="sidebar">
 			<p class="sidebar_heading"> TYPOGRAPHIE</p>
-		
 		</div>
 		<div class="labelbar">
 			
 			<?
-			
 			for ($j = 0; $j < 6; $j++) {
 				
 				echo "<div class='headingBox'>";
-					
 					$elementCollectionEP[$elementtype[$j]]['fontFamily'] = array_unique($elementCollectionEP[$elementtype[$j]]['fontFamily']);
 					for($i = 0;  $i < sizeof($elementCollectionEP[$elementtype[$j]]['fontFamily']); $i++){
 						if(strval($elementCollectionEP[$elementtype[$j]]['fontFamily'][$i] != "")){
@@ -361,22 +322,19 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 				echo "</div>";
 			}
 			
-			$elementCollectionEP['p']['fontFamily'] = array_unique($elementCollectionEP['p']['fontFamily']);
-			for($i = 0;  $i < sizeof($elementCollectionEP['p']['fontFamily']); $i++){
-				if(strval($elementCollectionEP['p']['fontFamily'][$i] != "")){
-					echo "<p>"."BODY ".":</p>";
+				$elementCollectionEP['p']['fontFamily'] = array_unique($elementCollectionEP['p']['fontFamily']);
+				for($i = 0;  $i < sizeof($elementCollectionEP['p']['fontFamily']); $i++){
+					if(strval($elementCollectionEP['p']['fontFamily'][$i] != "")){
+						echo "<p>"."BODY ".":</p>";
+					}
 				}
-			}
-			
-			
 			?>
-			git
 			<br>
 		</div>
+		
 		<div class="mainWindow">
 			
 			<?
-			
 			for ( $j = 0; $j < 6; $j ++ ) {
 				echo "<div class='headingBox'>";
 					$elementCollectionEP[ $elementtype[$j] ]['fontFamily'] = array_unique( $elementCollectionEP[ $elementtype[ $j ] ]['fontFamily'] );
@@ -417,9 +375,6 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 		<div class ="mainWindowColors">
 		<?
 		
-
-		//--------- COLOR-OUTPUT -------
-		
 		//TODO: REMOVE WHITE COLORS:
 		//TODO: MAX CONTRAST TEXT-COLORS
 		
@@ -442,10 +397,9 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 			
 			";
 			
-			
-			if(sizeof( $elementCollectionEP['*']['color']) - $i == 2){
-				//Two colors remain
-				
+			//TODO: AUftei
+			if(sizeof( $elementCollectionEP['*']['color']) - $i == 3){
+			//Two colors remaining from the previous loop
 				echo "
 				 <div class=\"colorBlock1\" style='background-color: ".$elementCollectionEP['*']['color'][$i+1]."!important'>
 					<p class=\"colorLabel\" >".$elementCollectionEP['*']['color'][$i+1]."</p>
@@ -457,8 +411,8 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 				";
 				
 				
-			} else if (sizeof( $elementCollectionEP['*']['color']) - $i == 1){
-				//One Color remains
+			} else if (sizeof( $elementCollectionEP['*']['color']) - $i == 2){
+			//One Color remaining from the previous loop
 				
 				echo "
 				<div class=\"colorBlock1\" style='background-color: ".$elementCollectionEP['*']['color'][$i+1]."!important'>
@@ -468,7 +422,6 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 				";
 				
 			}
-			
 		
 		}
 		
