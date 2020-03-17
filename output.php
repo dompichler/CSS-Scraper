@@ -216,7 +216,7 @@ foreach ($urls as $url) {
 			
 			//TODO: CSS Properties mit file_get_contents richtig encodieren!
 			$cssProperties[$prop] = $browser->script(file_get_contents('styleInFile.js' )."return styleInPage('$prop','$element');") [0];
-			print_r("CSS: ".$cssProperties[$prop][0]."\n");
+			//print_r("CSS: ".$cssProperties[$prop][0]."\n");
 		
 			foreach ($cssProperties[$prop] as $cssAttribute) {
 				if(strval($cssAttribute) != ""){
@@ -360,45 +360,14 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 			$elementCollectionEP['p']['fontFamily'] = array_unique($elementCollectionEP['p']['fontFamily']);
 			for($i = 0;  $i < sizeof($elementCollectionEP['p']['fontFamily']); $i++){
 				if(strval($elementCollectionEP['p']['fontFamily'][$i] != "")){
-					echo "<p>"."Text ".":</p>";
-					echo "<p>".$elementCollectionEP['p']['fontFamily'][$i]."</p>";
+					echo "<p>"."Body - Text ".":</p>";
 				}
 			}
 			
 			
 			?>
-			
-			<!--
-			$elementCollectionEP['h1']['fontFamily'] = array_unique($elementCollectionEP['h1']['fontFamily']);
-			for($i = 0;  $i < sizeof($elementCollectionEP['h1']['fontFamily']); $i++){
-				if(strval($elementCollectionEP['h1']['fontFamily'] != "")){
-					echo "<h1>H1:</h1>";
-				}
-			}
-			
-			$elementCollectionEP['h2']['fontFamily'] = array_unique($elementCollectionEP['h2']['fontFamily']);
-			for($i = 0;  $i < sizeof($elementCollectionEP['h2']['fontFamily']); $i++){
-				if(strval($elementCollectionEP['h2']['fontFamily'] != "")){
-					echo "<h2>H2:</h2>";
-				}
-			}
-			?>
-			<h3>H3:</h3>
-			<h4>H4:</h4>
-			<h5>H5:</h5>
-			<h6>H6:</h6>
-			-->
-			
 			
 			<br>
-			
-			<!--
-			<p class="text-BodyCopy">Body Copy 1a (short text):</p><br>
-			<p> Source Sans Pro</p><br>
-			<p class = "text-BodyCopy2"> Body Copy 2:</p><br>
-			<p> Source Sans Pro</p><br>
-			-->
-		
 		</div>
 		<div class="mainWindow">
 			
@@ -407,7 +376,7 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 				$elementCollectionEP[ $elementtype[$j] ]['fontFamily'] = array_unique( $elementCollectionEP[ $elementtype[ $j ] ]['fontFamily'] );
 				for ( $i = 0; $i < sizeof( $elementCollectionEP[ $elementtype[$j]]['fontFamily'] ); $i ++ ) {
 					if ( strval( $elementCollectionEP[ $elementtype[ $j ] ]['fontFamily'][$i] != "" ) ) {
-						echo "<".$elementtype[$j]."> HEADER - ".ucwords(strtolower($elementCollectionEP['h1']['fontFamily'][$i]), '_')." -  SIZE (TODO px):</".$elementtype[$j].">";
+						echo "<".$elementtype[$j]."> HEADER  ".ucwords(strtolower($elementCollectionEP['h1']['fontFamily'][$i]), '_')." -  SIZE (TODO px):</".$elementtype[$j].">";
 						//echo "<".$elementtype[$j]."> HEADER - ".$elementCollectionEP['h1']['fontFamily'][$i]." -  SIZE (TODO px):</".$elementtype[$j].">";
 					}
 				}
@@ -418,7 +387,7 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 			
 			for ( $i = 0; $i < sizeof( $elementCollectionEP['p']['fontFamily'] ); $i ++ ) {
 				if (strval( $elementCollectionEP['p']['fontFamily'][$i] != "" ) ) {
-					echo "<p style = font-family:".$elementCollectionEP['p']['fontFamily'][$i].">Of all of the celestial bodies that capture our attention and fascination as astronomers, none has a greater influence on life on planet Earth than it’s own satellite, the moon. When you think about it, we regard the moon with such powerful significance that unlike the moons of other planets which we give names, we only refer to our one and only orbiting orb as THE moon. It is not a moon. To us, it is the one and only moon.</p>";
+					echo "<p>Font: ".$elementCollectionEP['p']['fontFamily'][$i]."<br> "."Of all of the celestial bodies that capture our attention and fascination as astronomers, none has a greater influence on life on planet Earth than it’s own satellite, the moon. When you think about it, we regard the moon with such powerful significance that unlike the moons of other planets which we give names, we only refer to our one and only orbiting orb as THE moon. It is not a moon. To us, it is the one and only moon.</p>";
 				}
 			}
 			?>
@@ -432,38 +401,13 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 	
 	<div class="wrapper">
 		<div class ="sidebar">
-			<p class="sidebar_heading"> BUTTONS </p>
-		</div>
-		<div id="buttonBlock1">
-			<div class="buttonText">
-				<b>Primary Button</b>
-				<p class="buttonText">Font: Source Sans Pro Semi Bold <br>
-				                      Size: 13px<br>
-				                      Line Height Box: 55px<br>
-				                      Weight: 700<br>
-				                      Spacing: 0,6<br>
-			</div>
-		</div>
-		
-		
-		<div id="buttonBlock2">
-			<button class="btn_primary">PRIMARY</button><br>
-			<button class="btn_primary--pressed">PRESSED</button><br>
-			<button class="btn_primary--disabled">DISABLED</button><br>
-		
-		</div>
-	
-	
-	
-	</div>
-	<div class="wrapper">
-		<div class ="sidebar">
 			<p class="sidebar_heading"> COLOR </p>
 		</div>
 		<div class="labelbar">
 			<p> PRIMARY</p>
 		</div>
 		
+		<div class ="mainWindowColors">
 		<?
 		
 
@@ -523,6 +467,8 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 		
 		?>
 		
+	</div>
+		
 		
 		
 		<div class="labelbar">
@@ -551,6 +497,35 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 		</div>
 	
 	</div>
+	
+	
+	<div class="wrapper">
+		<div class ="sidebar">
+			<p class="sidebar_heading"> BUTTONS </p>
+		</div>
+		<div id="buttonBlock1">
+			<div class="buttonText">
+				<b>Primary Button</b>
+				<p class="buttonText">Font: Source Sans Pro Semi Bold <br>
+				                      Size: 13px<br>
+				                      Line Height Box: 55px<br>
+				                      Weight: 700<br>
+				                      Spacing: 0,6<br>
+			</div>
+		</div>
+		
+		
+		<div id="buttonBlock2">
+			<button class="btn_primary">PRIMARY</button><br>
+			<button class="btn_primary--pressed">PRESSED</button><br>
+			<button class="btn_primary--disabled">DISABLED</button><br>
+		
+		</div>
+	
+	
+	
+	</div>
+	
 	
 	<div class="wrapper">
 		<div class ="sidebar">

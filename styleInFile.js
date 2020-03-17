@@ -32,36 +32,43 @@ function styleInPage(css, type, verbose) {
         // add data-attribute with key for allStyles array
         thisNode.dataset.styleId = allStyles.indexOf(style);
       }
+  
+  
+  
+  
       
-      
-
-//Before Elements
-      styleBefore = getComputedStyle(thisNode, ':before')[css];
-      if (styleBefore) {
-        if (verbose) {
-          allStyles.push([styleId, styleBefore]);
-        } else if (allStyles.indexOf(styleBefore) == -1) {
-          allStyles.push(styleBefore);
-        }
-        
-        // add data-attribute with key for allStyles array
-        thisNode.dataset.styleId = allStyles.indexOf(styleBefore);
-      }
-      
-
-//After Elements
-      styleAfter = getComputedStyle(thisNode, ':after')[css];
-      if (styleAfter) {
-        if (verbose) {
-          allStyles.push([styleId, styleAfter]);
-        } else if (allStyles.indexOf(styleAfter) == -1) {
-          allStyles.push(styleAfter);
-        }
-        
-        // add data-attribute with key for allStyles array
-        thisNode.dataset.styleId = allStyles.indexOf(styleAfter);
-      }
+ //Before Elements
+       styleBefore = getComputedStyle(thisNode, ':before')[css];
+       if (styleBefore) {
+         if (verbose) {
+           allStyles.push([styleId, styleBefore]);
+         } else if (allStyles.indexOf(styleBefore) == -1) {
+           allStyles.push(styleBefore);
+         }
+         
+         // add data-attribute with key for allStyles array
+         thisNode.dataset.styleId = allStyles.indexOf(styleBefore);
+       }
+       
+ 
+ //After Elements
+       styleAfter = getComputedStyle(thisNode, ':after')[css];
+       if (styleAfter) {
+         if (verbose) {
+           allStyles.push([styleId, styleAfter]);
+         } else if (allStyles.indexOf(styleAfter) == -1) {
+           allStyles.push(styleAfter);
+         }
+         
+         // add data-attribute with key for allStyles array
+         thisNode.dataset.styleId = allStyles.indexOf(styleAfter);
+       }
+       
+       
     }
-  }
+    
+    }
+  
+  
   return allStyles;
 }
