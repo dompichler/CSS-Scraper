@@ -21,19 +21,14 @@ $driver = retry(5, function () use($capabilities) {
 
 
 $browser = new Browser($driver);
-
-
-
 	
 	$userName = $_POST['userUrl'];
 	if(strval($userName) == ""){ $userName ="Webnique";}
 	
-	$userURL = "http://www.webnique.de/";
-	$userHTML = $_POST['userHtml'];
-	$userCSS = $_POST['userCss'];
-	$userCheckBox = 'off'; //All subpages will be included by default!
+	$userURL = "https://www.webnique.de/";
+	$userCheckBox = 'off'; //If var is set "on", all subpages will be included by default!
 
-	$elementtype =   ['h1','h2','h3','h4','h5','h6','p'];
+	$elementtype =   ['h1','h2','h3','h4','h5','h6','p', '*'];
 	$cssProperty = ['fontFamily','color','font-weight'];
 
 
@@ -56,10 +51,13 @@ $browser = new Browser($driver);
 	
 	// ------ Everything else: not valid
 	} else if ((substr( $userURLToCheck, 0, 5 ) !== "https")){
-		echo "<script> location.href='404.html'; </script>";
-		exit;
+		//echo "<script> location.href='404.html'; </script>";
+		//exit;
 	}
 
+//TODO: HostCode Extraction muss noch angepasst werden!
+
+/*
 //Extracting a hostcode out of the UserURL to identify all subpages that belong to the userURL
 	$subject = strval($userURL);
 	if(substr( $subject, 0, 4 ) === "http") {
@@ -75,10 +73,13 @@ $browser = new Browser($driver);
 	} else {
 		$hostCode  = $subject;
 	}
+
+*/
+
+$hostCode='webnique';
 	
 $host = $userURL;
-	
-	
+
 
 
 
@@ -104,7 +105,6 @@ $host = $userURL;
 		
 		if(curl_getinfo($ch)['http_code'] = 200){
 			$urlSitemap = $host . $file;
-			//print_r($urlSitemap);
 			
 			
 
@@ -121,6 +121,9 @@ $host = $userURL;
 		//Sitemap will be converted into an array of URLS
 			$dom = new DOMDocument;
 			$dom->loadHTML($sitemapHTML);
+			
+			
+			
 	
 			foreach ($dom->getElementsByTagName('a') as $node)
 			{
@@ -174,6 +177,8 @@ $host = $userURL;
 		}
 		curl_close($ch);
 	}
+		
+		
 
 /* =============== GET UNIQUE CSS-ELEMENTS =============== */
 
@@ -208,9 +213,15 @@ foreach ($urls as $url) {
 	foreach ($elementtype as $element){
 		$cssProperties = [];
 		foreach ($cssProperty as $prop){
+			
+			//TODO: CSS Properties mit file_get_contents richtig encodieren!
 			$cssProperties[$prop] = $browser->script(file_get_contents('styleInFile.js' )."return styleInPage('$prop','$element');") [0];
+			print_r("CSS: ".$cssProperties[$prop][0]."\n");
+		
 			foreach ($cssProperties[$prop] as $cssAttribute) {
-				array_push($elementCollectionEP[$element][$prop],$cssAttribute);
+				if(strval($cssAttribute) != ""){
+					array_push($elementCollectionEP[$element][$prop],$cssAttribute);
+				}
 			}
 		}
 		$elementCollection[$element] = $cssProperties;
@@ -406,45 +417,14 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 			$elementCollectionEP['p']['fontFamily'] = array_unique($elementCollectionEP['p']['fontFamily']);
 			
 			for ( $i = 0; $i < sizeof( $elementCollectionEP['p']['fontFamily'] ); $i ++ ) {
-				if ( strval( $elementCollectionEP['p']['fontFamily'][$i] != "" ) ) {
+				if (strval( $elementCollectionEP['p']['fontFamily'][$i] != "" ) ) {
 					echo "<p style = font-family:".$elementCollectionEP['p']['fontFamily'][$i].">Of all of the celestial bodies that capture our attention and fascination as astronomers, none has a greater influence on life on planet Earth than it’s own satellite, the moon. When you think about it, we regard the moon with such powerful significance that unlike the moons of other planets which we give names, we only refer to our one and only orbiting orb as THE moon. It is not a moon. To us, it is the one and only moon.</p>";
 				}
 			}
-			
-			
-			
-			?>
-			<!--
-			//TODO: Brauch ich die unique Funktion hier überhaupt noch?
-			$elementCollectionEP['h1']['fontFamily'] = array_unique($elementCollectionEP['h1']['fontFamily']);
-			for($i = 0;  $i < sizeof($elementCollectionEP['h1']['fontFamily']); $i++){
-				if(strval($elementCollectionEP['h1']['fontFamily'][$i]) != ""){
-					echo "<h1> HEADER - ".str_replace(ucwords(strtolower($elementCollectionEP['h1']['fontFamily'][$i]), '_'),'_',' ')." -  SIZE (TODO px):</h1>";
-				}
-			}
-			
-			
-			$elementCollectionEP['h2']['fontFamily'] = array_unique($elementCollectionEP['h2']['fontFamily']);
-			for($i = 0;  $i < sizeof($elementCollectionEP['h2']['fontFamily']); $i++){
-				if(strval($elementCollectionEP['h2']['fontFamily'][$i]) != ""){
-					echo "<h2> HEADER - ".$elementCollectionEP['h2']['fontFamily'][$i]." -  SIZE (TODO px):</h2>";
-				}
-			}
-			
 			?>
 			
-			<h3>HEADER  - Font - SIZE (30px)</h3>
-			<h4>HEADER  - Font - SIZE (22p)</h4>
-			<h5>HEADER  - Font - SIZE (20px)</h5>
-			<h6>HEADER  - Font - SIZE (15p)</h6>
-			
-			
-			-->
 			<br>
-			<!--
-			<p>Of all of the celestial bodies that capture our attention and fascination as astronomers</p>
-			<p>Of all of the celestial bodies that capture our attention and fascination as astronomers, none has a greater influence on life on planet Earth than it’s own satellite, the moon. When you think about it, we regard the moon with such powerful significance that unlike the moons of other planets which we give names, we only refer to our one and only orbiting orb as THE moon. It is not a moon. To us, it is the one and only moon.</p>
-			-->
+		
 		</div>
 	</div>
 	
@@ -484,17 +464,66 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 			<p> PRIMARY</p>
 		</div>
 		
-		<div class="colorBlock1">
-			<p class="colorLabel"> #cdcdcd </p>
-		</div>
+		<?
 		
-		<div class="colorBlock2">
-			<p class="colorLabel" style="color: black;"> #f2d3ee </p>
-		</div>
-		<div class="colorBlock3">
-			<p class="colorLabel"> #ab23ac </p>
+
+		//--------- COLOR-OUTPUT -------
 		
-		</div>
+		//TODO: REMOVE WHITE COLORS:
+		//TODO: MAX CONTRAST TEXT-COLORS
+		
+		$elementCollectionEP['*']['color'] = array_unique($elementCollectionEP['*']['color']);
+		
+		for($i=0; $i < sizeof( $elementCollectionEP['*']['color'] ); $i = $i+3){
+			
+			echo "
+            <div class=\"colorBlock1\" style='background-color: ".$elementCollectionEP['*']['color'][$i]."!important'>
+				<p class=\"colorLabel\" >".$elementCollectionEP['*']['color'][$i]."</p>
+			</div>
+			
+			<div class=\"colorBlock2\" style='background-color: ".$elementCollectionEP['*']['color'][$i+1]."!important'>
+				<p class=\"colorLabel\" >".$elementCollectionEP['*']['color'][$i+1]."</p>
+			</div>
+			
+			<div class=\"colorBlock3\" style='background-color: ".$elementCollectionEP['*']['color'][$i+2]."!important'>
+				<p class=\"colorLabel\" >".$elementCollectionEP['*']['color'][$i+2]."</p>
+			</div>
+			
+			";
+			
+			
+			if(sizeof( $elementCollectionEP['*']['color']) - $i == 2){
+				//Two colors remain
+				
+				echo "
+				 <div class=\"colorBlock1\" style='background-color: ".$elementCollectionEP['*']['color'][$i+1]."!important'>
+					<p class=\"colorLabel\" >".$elementCollectionEP['*']['color'][$i+1]."</p>
+				</div>
+			
+			<div class=\"colorBlock2\"  style='background-color: ".$elementCollectionEP['*']['color'][$i+2]."!important'>
+				<p class=\"colorLabel\">".$elementCollectionEP['*']['color'][$i+2]."</p>
+			</div>
+				";
+				
+				
+			} else if (sizeof( $elementCollectionEP['*']['color']) - $i == 1){
+				//One Color remains
+				
+				echo "
+				<div class=\"colorBlock1\" style='background-color: ".$elementCollectionEP['*']['color'][$i+1]."!important'>
+					<p class=\"colorLabel\" >".$elementCollectionEP['*']['color'][$i+1]."</p>
+				</div>
+				
+				";
+				
+			}
+			
+		
+		}
+		
+		?>
+		
+		
 		
 		<div class="labelbar">
 			<p> SECONDARY</p>
