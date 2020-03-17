@@ -324,7 +324,6 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<link rel="stylesheet" href="style.css">
-	<link rel="stylesheet" href="Styleguide/styleguide.css">
 	
 	
 	<? echo"<title>".$hostCode."- Styleguide</title>"?>
@@ -336,11 +335,13 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 <div class = "container">
 	<div class="container_heading">
 		<? echo"<h1>".$userName."- Styleguide</h1>"?>
+		
+		
 	</div>
 	
 	<div class="wrapper">
 		<div class ="sidebar">
-			<p class="sidebar_heading"> DESKTOP<br>TYPOGRAPHIE</p>
+			<p class="sidebar_heading"> TYPOGRAPHIE</p>
 		
 		</div>
 		<div class="labelbar">
@@ -348,40 +349,46 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 			<?
 			
 			for ($j = 0; $j < 6; $j++) {
-				$elementCollectionEP[$elementtype[$j]]['fontFamily'] = array_unique($elementCollectionEP[$elementtype[$j]]['fontFamily']);
-				for($i = 0;  $i < sizeof($elementCollectionEP[$elementtype[$j]]['fontFamily']); $i++){
-					if(strval($elementCollectionEP[$elementtype[$j]]['fontFamily'][$i] != "")){
-						echo "<".$elementtype[$j].">"."H".($j + 1).":</".$elementtype[$j].">";
-					}
-				}
 				
+				echo "<div class='headingBox'>";
+					
+					$elementCollectionEP[$elementtype[$j]]['fontFamily'] = array_unique($elementCollectionEP[$elementtype[$j]]['fontFamily']);
+					for($i = 0;  $i < sizeof($elementCollectionEP[$elementtype[$j]]['fontFamily']); $i++){
+						if(strval($elementCollectionEP[$elementtype[$j]]['fontFamily'][$i] != "")){
+							echo "<".$elementtype[$j].">"."H".($j + 1).":</".$elementtype[$j].">";
+						}
+					}
+				echo "</div>";
 			}
 			
 			$elementCollectionEP['p']['fontFamily'] = array_unique($elementCollectionEP['p']['fontFamily']);
 			for($i = 0;  $i < sizeof($elementCollectionEP['p']['fontFamily']); $i++){
 				if(strval($elementCollectionEP['p']['fontFamily'][$i] != "")){
-					echo "<p>"."Body - Text ".":</p>";
+					echo "<p>"."BODY ".":</p>";
 				}
 			}
 			
 			
 			?>
-			
+			git
 			<br>
 		</div>
 		<div class="mainWindow">
 			
 			<?
+			
 			for ( $j = 0; $j < 6; $j ++ ) {
-				$elementCollectionEP[ $elementtype[$j] ]['fontFamily'] = array_unique( $elementCollectionEP[ $elementtype[ $j ] ]['fontFamily'] );
-				for ( $i = 0; $i < sizeof( $elementCollectionEP[ $elementtype[$j]]['fontFamily'] ); $i ++ ) {
-					if ( strval( $elementCollectionEP[ $elementtype[ $j ] ]['fontFamily'][$i] != "" ) ) {
-						echo "<".$elementtype[$j]."> HEADER  ".ucwords(strtolower($elementCollectionEP['h1']['fontFamily'][$i]), '_')." -  SIZE (TODO px):</".$elementtype[$j].">";
-						//echo "<".$elementtype[$j]."> HEADER - ".$elementCollectionEP['h1']['fontFamily'][$i]." -  SIZE (TODO px):</".$elementtype[$j].">";
+				echo "<div class='headingBox'>";
+					$elementCollectionEP[ $elementtype[$j] ]['fontFamily'] = array_unique( $elementCollectionEP[ $elementtype[ $j ] ]['fontFamily'] );
+					for ( $i = 0; $i < sizeof( $elementCollectionEP[ $elementtype[$j]]['fontFamily'] ); $i ++ ) {
+						if ( strval( $elementCollectionEP[ $elementtype[ $j ] ]['fontFamily'][$i] != "" ) ) {
+							echo "<".$elementtype[$j]."> HEADER  ".ucwords(strtolower($elementCollectionEP['h1']['fontFamily'][$i]), '_')." -  SIZE (TODO px):</".$elementtype[$j].">";
+							//echo "<".$elementtype[$j]."> HEADER - ".$elementCollectionEP['h1']['fontFamily'][$i]." -  SIZE (TODO px):</".$elementtype[$j].">";
+						}
 					}
-				}
-				
+				echo "</div>";
 			}
+			
 			
 			$elementCollectionEP['p']['fontFamily'] = array_unique($elementCollectionEP['p']['fontFamily']);
 			
@@ -526,7 +533,24 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 	
 	</div>
 	
+	<div>
+		<button class="btn" value ="test" onclick=""> Download</button>
+		<button class="btn" value ="test" onclick="hideElement()"> Durchsuchte Seiten anzeigen</button>
+		<button class="btn" value ="test" onclick="hideOldVersion()"> Alte Version anzeigen</button>
+		
+		<div id="urlList">
+			<? foreach ($subpages as $pages){
+				echo "<div>".$pages."</div>";
+			}
+			?>
+		</div>
 	
+	
+	</div>
+	
+	
+	
+	<!--
 	<div class="wrapper">
 		<div class ="sidebar">
 			<p class="sidebar_heading"> ICONGRAPHY </p>
@@ -561,22 +585,13 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 	
 	
 	</div>
-
+-->
 </div>
 
 <!-- ALTE VERSION -->
 
-<div class="container">
-	
-	<div>
-		<button class="btn" value ="test" onclick="hideElement()"> Durchsuchte Seiten anzeigen</button>
-		<div id="urlList">
-			<? foreach ($subpages as $pages){
-					echo "<div>".$pages."</div>";
-				}
-			?>
-		</div>
-	</div>
+<div class="container" id="oldVersion">
+
 	
 <?
 	$urlCounter = 0;
@@ -627,6 +642,15 @@ Baskerville, "Palatino Linotype", Palatino, "Times New Roman", serif
 <script>
   function hideElement() {
     var temp = document.getElementById("urlList");
+    if (temp.style.display === "none") {
+      temp.style.display = "block";
+    } else {
+      temp.style.display = "none";
+    }
+  }
+
+  function hideOldVersion() {
+    var temp = document.getElementById("oldVersion");
     if (temp.style.display === "none") {
       temp.style.display = "block";
     } else {
