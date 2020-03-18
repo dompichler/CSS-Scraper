@@ -29,7 +29,7 @@ $browser = new Browser($driver);
 	if(strval($userName) == ""){ $userName ="Webnique";}
 	
 	$userURL = "https://www.webnique.de/";
-	$userCheckBox = 'off'; //If var is set "on", all subpages will be included by default!
+	$userCheckBox = 'on'; //If var is set "on", all subpages will be included by default!
 
 	$elementtype =   ['h1','h2','h3','h4','h5','h6','p', '*'];
 	$cssProperty = ['fontFamily','color','font-weight'];
